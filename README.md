@@ -1,8 +1,8 @@
 # simple-bot
 
-Simple bot for Telegram and VK
+Simple echo bot for Telegram and VK
 
 ## Config
 
-.env file properties:
+bot.config file properties:
 - BOT_TOKEN - telegram bot token

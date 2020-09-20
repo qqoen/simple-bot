@@ -2,4 +2,7 @@
 *~
 .ghc.environment.*
 dist-*
-.env
+.vscode
+.history
+
+bot.config

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a01400a498c8c5377ac328a16e86526b5288d07c707e284787570f075006cb2a
+-- hash: 77c208fe668f32ac2b4cc1a14b13b37b876320c8164efdfdc8c01d8f60c061fb
 
 name:           simple-bot
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      ConfigParser
       Lib
   other-modules:
       Paths_simple_bot
