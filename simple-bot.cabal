@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 42c9a394b7036d5b582eed8b34c14b3a6a642cb8c11845bb8f02903e33e478b3
+-- hash: a01400a498c8c5377ac328a16e86526b5288d07c707e284787570f075006cb2a
 
 name:           simple-bot
 version:        0.1.0.0
@@ -34,6 +34,11 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , bytestring
+    , http-conduit
+    , lens
+    , lens-aeson
+    , text
   default-language: Haskell2010
 
 executable simple-bot-exe
@@ -45,7 +50,12 @@ executable simple-bot-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , bytestring
+    , http-conduit
+    , lens
+    , lens-aeson
     , simple-bot
+    , text
   default-language: Haskell2010
 
 test-suite simple-bot-test
@@ -58,5 +68,10 @@ test-suite simple-bot-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , bytestring
+    , http-conduit
+    , lens
+    , lens-aeson
     , simple-bot
+    , text
   default-language: Haskell2010

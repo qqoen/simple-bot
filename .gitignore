@@ -2,3 +2,4 @@
 *~
 .ghc.environment.*
 dist-*
+.env
