@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 614be5051ce859a59d58a72b6f40043302853fba6cb8928fb6cde56cbbfc3aa6
+-- hash: 3f5b855a980a1276dacce336d48dcbc4a129585b98b427f386dc4cfc54bd5019
 
 name:           simple-bot
 version:        0.1.0.0
@@ -49,7 +49,7 @@ executable simple-bot-exe
       Paths_simple_bot
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -Werror
   build-depends:
       aeson
     , base >=4.7 && <5
@@ -66,7 +66,7 @@ test-suite simple-bot-test
       Paths_simple_bot
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -Werror
   build-depends:
       aeson
     , base >=4.7 && <5

@@ -1,6 +1,10 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
+{-
+Common types: for JSON parsing, etc.
+-}
+
 module Types
     ( TgResponse(..)
     , TgUpdate(..)
@@ -10,7 +14,7 @@ module Types
     , getChatId
     ) where
 
-import Prelude (Bool(..), Show(..), Integer(..), String(..), (.), ($), (<$>), (<*>))
+import Prelude (Bool(..), Show(..), Integer, String, (.), ($), (<$>), (<*>))
 
 import Data.Aeson
 

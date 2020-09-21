@@ -6,4 +6,5 @@ dist-*
 .history
 
 bot.config
+bot.log
 TODO.md

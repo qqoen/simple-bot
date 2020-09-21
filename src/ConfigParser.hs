@@ -1,6 +1,7 @@
 module ConfigParser
     ( readConfig
     , getValue
+    , Config
     ) where
 
 import System.IO
@@ -17,7 +18,7 @@ readConfig fileName = do
 getValue :: String -> Config -> Maybe String
 getValue key config =
     case find ((==key) . fst) config of
-        Just (key', val) -> Just val
+        Just (_, val) -> Just val
         Nothing -> Nothing
 
 parse :: String -> Config
