@@ -1,29 +1,42 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Types
     ( TgResponse(..)
     , TgUpdate(..)
     , TgMessage(..)
+    , TgChat(..)
     , getText
+    , getChatId
     ) where
+
+import Prelude (Bool(..), Show(..), Integer(..), String(..), (.), ($), (<$>), (<*>))
 
 import Data.Aeson
 
 data TgResponse = TgResponse 
     { ok :: Bool
     , result :: [TgUpdate]
-    } deriving Show
+    } deriving (Show)
 
 data TgUpdate = TgUpdate
     { message :: TgMessage
-    } deriving Show
+    } deriving (Show)
 
 data TgMessage = TgMessage
     { text :: String
-    } deriving Show
+    , chat :: TgChat
+    } deriving (Show)
+
+data TgChat = TgChat
+    { id :: Integer
+    } deriving (Show)
 
 getText :: TgUpdate -> String
 getText = text . message
+
+getChatId :: TgUpdate -> Integer
+getChatId = id . chat . message
 
 instance FromJSON TgResponse where
     parseJSON = withObject "tgResponse" $ \o ->
@@ -35,4 +48,8 @@ instance FromJSON TgUpdate where
 
 instance FromJSON TgMessage where
     parseJSON = withObject "tgMessage" $ \o ->
-        TgMessage <$> o .: "text"
+        TgMessage <$> o .: "text" <*> o .: "chat"
+
+instance FromJSON TgChat where
+    parseJSON = withObject "tgChat" $ \o ->
+        TgChat <$> o .: "id"

@@ -8,5 +8,5 @@ main :: IO ()
 main = do
     start
     -- 2 seconds
-    threadDelay (2 * 1000000)
-    main
+    -- threadDelay (2 * 1000000)
+    -- main
