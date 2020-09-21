@@ -1,15 +1,12 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Main where
 
-import qualified Data.Text.IO as TIO
+import Control.Concurrent (threadDelay)
 
 import Lib
 
 main :: IO ()
 main = do
-    baseUrl <- getBaseTgUrl
-    json <- fetchJSON (baseUrl <> "getMe")
-    case getName json of
-        Just name -> TIO.putStrLn ("Bot name: " <> name)
-        Nothing   -> TIO.putStrLn "No data"
+    start
+    -- 2 seconds
+    threadDelay (2 * 1000000)
+    main

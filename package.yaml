@@ -24,8 +24,7 @@ dependencies:
 - bytestring
 - text
 - http-conduit
-- lens
-- lens-aeson 
+- aeson
 
 library:
   source-dirs: src
