@@ -23,8 +23,10 @@ data TgResponse = TgResponse
     , result :: [TgUpdate]
     } deriving (Show)
 
+-- TODO: rename update_id, rearrange
 data TgUpdate = TgUpdate
     { message :: TgMessage
+    , update_id :: Integer
     } deriving (Show)
 
 data TgMessage = TgMessage
@@ -32,15 +34,15 @@ data TgMessage = TgMessage
     , chat :: TgChat
     } deriving (Show)
 
-data TgChat = TgChat
-    { id :: Integer
+newtype TgChat = TgChat
+    { chatId :: Integer
     } deriving (Show)
 
 getText :: TgUpdate -> String
 getText = text . message
 
 getChatId :: TgUpdate -> Integer
-getChatId = id . chat . message
+getChatId = chatId . chat . message
 
 instance FromJSON TgResponse where
     parseJSON = withObject "tgResponse" $ \o ->
@@ -48,7 +50,7 @@ instance FromJSON TgResponse where
 
 instance FromJSON TgUpdate where
     parseJSON = withObject "tgUpdate" $ \o ->
-        TgUpdate <$> o .: "message"
+        TgUpdate <$> o .: "message" <*> o .: "update_id"
 
 instance FromJSON TgMessage where
     parseJSON = withObject "tgMessage" $ \o ->

@@ -1,11 +1,9 @@
 module ConfigParser
     ( readConfig
-    , getValue
     , Config
     ) where
 
 import System.IO
-import Data.List (find)
 
 type Config = [(String, String)]
 
@@ -14,12 +12,6 @@ readConfig fileName = do
     handle <- openFile fileName ReadMode
     contents <- hGetContents handle
     return $ parse contents
-
-getValue :: String -> Config -> Maybe String
-getValue key config =
-    case find ((==key) . fst) config of
-        Just (_, val) -> Just val
-        Nothing -> Nothing
 
 parse :: String -> Config
 parse content =
