@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE LambdaCase #-}
 
 module Bots.Telegram
     ( start
@@ -7,8 +8,8 @@ module Bots.Telegram
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy.Char8 as LBS
 import Data.String (fromString)
+import Data.Maybe (isJust)
 import Control.Concurrent (threadDelay)
-import Control.Monad (void)
 import Control.Monad.IO.Class (MonadIO)
 
 import Network.HTTP.Simple (Query, httpBS, getResponseBody, parseRequest_, setRequestQueryString)
@@ -29,16 +30,16 @@ start cfg = runTgBot $ B.getEnv cfg
 
 runTgBot :: B.Env -> IO ()
 runTgBot env = do
-    updId <- getUpdates env
+    env' <- getUpdates env
 
-    B.logger env B.Debug ("Update id: " <> show updId)
+    if isJust $ B.updateId env' then
+        runTgBot (env' { B.updateId = fmap succ (B.updateId env') })
+    else do
+        threadDelay $ seconds 3
+        runTgBot env'
 
-    if updId /= (-1) then
-        void $ getUpdates (env { B.updateId = Just (updId + 1) })
-    else
-        -- 2 seconds
-        void $ threadDelay (2 * 1000000)
-        -- runTgBot env
+seconds :: Int -> Int
+seconds = (*1000000)
 
 sendWithQuery :: MonadIO m => Query -> String -> m BS.ByteString
 sendWithQuery query url = do
@@ -48,47 +49,48 @@ sendWithQuery query url = do
         req = parseRequest_ url
         req' = setRequestQueryString query req
 
-getUpdates :: B.Env -> IO Integer
+getUpdates :: B.Env -> IO B.Env
 getUpdates env = do
-    let url = B.tgBaseUrl env
-    let updUrl = url <> "getUpdates"
+    let url = B.tgBaseUrl env <> "getUpdates"
+        query = [("offset", fmap (fromString . show) (B.updateId env))]
 
-    B.logger env B.Debug $ "GET: " <> updUrl
-
-    let query = [("offset", fmap (fromString . show) (B.updateId env))]
-    json <- sendWithQuery query updUrl
-
+    B.logger env B.Debug $ "GET: " <> url
+    json <- sendWithQuery query url
     B.logger env B.Debug $ "Response: " <> show json
 
     let response = decode (LBS.fromStrict json) :: Maybe T.TgResponse
 
-    updData <- handleResponse response
+    updData <- handleResponse env response
 
     let results = map (B.handleCommand env) (messages updData)
 
     if null results
-        then return ()
-        else
-            -- TODO: respond to all updates
-            sendMessage env (chatId updData) (head results)
+        then return $ env { B.updateId = Nothing }
+        else do
+            let lastRes = last results
+            handleBotAnswer lastRes updData
 
-    return $ updateId updData
+handleBotAnswer :: (B.Env, [String]) -> UpdateData -> IO B.Env
+handleBotAnswer (env, msgs) updData = do
+    mapM_ (sendMessage env (chatId updData)) msgs
+    return env { B.updateId = Just $ updateId updData }
 
-handleResponse :: Maybe T.TgResponse -> IO UpdateData
-handleResponse Nothing = do
-    putStrLn "handleResponse: No data"
-    return $ UpdateData [] (-1) (-1)
-handleResponse (Just response) =
-    case T.result response of
-        [] -> do
-            putStrLn "handleResponse: No updates"
-            return $ UpdateData [] (-1) (-1)
-        xs ->
-            let msgs = map T.getText xs
-                chatId' = T.getChatId (head xs)
-                updateId' = T.update_id (last xs)
-            in
-                return $ UpdateData msgs chatId' updateId'
+handleResponse :: B.Env -> Maybe T.TgResponse -> IO UpdateData
+handleResponse env = \case
+    Nothing -> do
+        B.logger env B.Debug "handleResponse: No data"
+        return $ UpdateData [] (-1) (-1)
+    Just response ->
+        case T.result response of
+            [] -> do
+                B.logger env B.Debug "handleResponse: No updates"
+                return $ UpdateData [] (-1) (-1)
+            xs ->
+                let msgs = map T.getText xs
+                    chatId' = T.getChatId (head xs)
+                    updateId' = T.updateId (last xs)
+                in
+                    return $ UpdateData msgs chatId' updateId'
 
 sendMessage :: B.Env -> Integer -> String -> IO ()
 sendMessage env chatId' msg = do
@@ -97,11 +99,14 @@ sendMessage env chatId' msg = do
     B.logger env B.Debug $ "Response: " <> show json
     where
         markup = getKeyboardMarkup $ map (show :: Int -> String) [1..5]
+        markupM = if B.isAwait env then Just $ fromString markup else Nothing
+
         query :: [(BS.ByteString, Maybe BS.ByteString)]
         query = [ ("chat_id", (Just . fromString . show) chatId')
                  , ("text", Just $ fromString msg)
-                 , ("reply_markup", Just $ fromString markup)
+                 , ("reply_markup", markupM)
                  ]
+
         finalUrl = B.tgBaseUrl env <> "sendMessage"
 
 getKeyboardMarkup :: [String] -> String

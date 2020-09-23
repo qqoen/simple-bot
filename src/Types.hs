@@ -21,10 +21,9 @@ data TgResponse = TgResponse
     , result :: [TgUpdate]
     } deriving (Show)
 
--- TODO: rename update_id, rearrange
 data TgUpdate = TgUpdate
     { message :: TgMessage
-    , update_id :: Integer
+    , updateId :: Integer
     } deriving (Show)
 
 data TgMessage = TgMessage
