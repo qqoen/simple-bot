@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8af8060a2d2c8a6af4ad353ee5dd1333b0ae710fd159c95ee0c3a6f047dfaefe
+-- hash: d63345721c440d1f6f40199eabd52e3650150aabff7537ba7af231f248e48388
 
 name:           simple-bot
 version:        0.1.0.0
@@ -27,7 +27,6 @@ source-repository head
 library
   exposed-modules:
       Bot
-      BotIO
       Bots.Telegram
       Bots.Vk
       Common

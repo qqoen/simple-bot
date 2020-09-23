@@ -6,7 +6,10 @@ module Bot
     ( handleCommand
     , getEnv
     , isAwait
+    , runBot
+
     , Env(..)
+    , Bot(..)
     ) where
 
 import Prelude hiding (log)
@@ -29,6 +32,23 @@ data Env = Env
     , repeatCount :: Int
     , botMode :: BotMode
     }
+
+data Bot m = Bot
+    { getUpdate :: Env -> m Env
+    , sendMessage :: Env -> String -> m ()
+    }
+
+runBot :: Monad m => Bot m -> Env -> m ()
+runBot bot env = do
+    env' <- updateBot bot env
+    runBot bot env'
+
+updateBot :: Monad m => Bot m -> Env -> m Env
+updateBot bot env = do
+    env' <- getUpdate bot env
+    let (env'', responses) = handleCommand env' (message env')
+    mapM_ (sendMessage bot env'') responses
+    return env''
 
 getEnv :: CT.BotConfig -> Env
 getEnv cfg = Env

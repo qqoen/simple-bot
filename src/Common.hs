@@ -3,7 +3,7 @@ module Common
     ) where
 
 import Control.Monad.IO.Class (MonadIO)
-import qualified Data.ByteString.Char8 as BS
+import qualified Data.ByteString as BS
 
 import Network.HTTP.Simple (Query, httpBS, getResponseBody, parseRequest_, setRequestQueryString)
 
