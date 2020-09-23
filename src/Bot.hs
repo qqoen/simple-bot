@@ -1,26 +1,30 @@
 {-# LANGUAGE LambdaCase #-}
 
+-- Pure common bot logic
+
 module Bot
     ( handleCommand
     , getEnv
     , isAwait
     , Env(..)
-    , LogLevel(..)
     ) where
 
+import Prelude hiding (log)
 import Data.Char (isDigit)
 
-import Logger
 import qualified Config.Types as CT
 
 data BotMode = Idle | AwaitingRepeatCount
 
 data Env = Env
-    { tgBaseUrl :: String
-    , helpMsg :: String
+    { helpMsg :: String
     , repeatMsg :: String
+    , pollTimeout :: Int
+    , message :: String
+    -- Tg specific
+    , tgBaseUrl :: String
     , updateId :: Maybe Integer
-    , logger :: LogLevel -> String -> IO ()
+    , chatId :: Maybe Integer
     -- Bot state
     , repeatCount :: Int
     , botMode :: BotMode
@@ -28,11 +32,13 @@ data Env = Env
 
 getEnv :: CT.BotConfig -> Env
 getEnv cfg = Env
-    { tgBaseUrl = "https://api.telegram.org/bot" <> CT.tgToken cfg <> "/"
-    , helpMsg = CT.helpMsg cfg
+    { helpMsg = CT.helpMsg cfg
     , repeatMsg = CT.repeatMsg cfg
+    , pollTimeout = 100
+    , message = ""
+    , tgBaseUrl = "https://api.telegram.org/bot" <> CT.tgToken cfg <> "/"
     , updateId = Nothing
-    , logger = writeLog Debug
+    , chatId = Nothing
     , repeatCount = CT.defaultRepeat cfg
     , botMode = Idle
     }

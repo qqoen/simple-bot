@@ -1,15 +1,28 @@
 module Logger
-    ( LogLevel(..)
-    , writeLog
+    ( Level(..)
+    , log
+    , logDebug
+    , logWarn
+    , logError
     ) where
 
-import Data.Char (toUpper)
-import Control.Monad (when)
+import Prelude hiding (log)
 
-data LogLevel = Debug | Warn | Error
+import Data.Char (toUpper)
+
+data Level = Debug | Warn | Error
     deriving (Show, Read, Eq, Ord)
 
-writeLog :: LogLevel -> LogLevel -> String -> IO ()
-writeLog maxLevel level msg =
-    when (level >= maxLevel) (putStrLn ("[" <> tag <> "] " <> msg <> "\n"))
+log :: Level -> String -> IO ()
+log level msg =
+    putStrLn ("[" <> tag <> "] " <> msg <> "\n")
     where tag = map toUpper $ show level
+
+logDebug :: String -> IO ()
+logDebug = log Debug
+
+logWarn :: String -> IO ()
+logWarn = log Warn
+
+logError :: String -> IO ()
+logError = log Error

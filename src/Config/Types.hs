@@ -13,7 +13,7 @@ data BotConfig = BotConfig
     , defaultRepeat :: Int
     , tgToken :: String
     , vkToken :: String
-    , logLevel :: LogLevel 
+    , logLevel :: Level
     , logConsole :: Bool
     , currentBot :: BotType
     }
