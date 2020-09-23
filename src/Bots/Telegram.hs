@@ -10,14 +10,15 @@ import qualified Data.ByteString.Lazy.Char8 as LBS
 import Data.String (fromString)
 import Data.Maybe (isJust)
 import Control.Concurrent (threadDelay)
-import Control.Monad.IO.Class (MonadIO)
+import Control.Exception (catch)
 
-import Network.HTTP.Simple (Query, httpBS, getResponseBody, parseRequest_, setRequestQueryString)
 import Data.Aeson (decode)
+import Network.HTTP.Simple (HttpException(..))
 
 import qualified Types as T
 import qualified Bot as B
 import Config.Types
+import Common
 
 data UpdateData = UpdateData
     { messages :: [String]
@@ -25,12 +26,15 @@ data UpdateData = UpdateData
     , updateId :: Integer
     }
 
+pollTimeout :: Int
+pollTimeout = 60
+
 start :: BotConfig -> IO ()
 start cfg = runTgBot $ B.getEnv cfg
 
 runTgBot :: B.Env -> IO ()
 runTgBot env = do
-    env' <- getUpdates env
+    env' <- catch (getUpdates env) handler
 
     if isJust $ B.updateId env' then
         runTgBot (env' { B.updateId = fmap succ (B.updateId env') })
@@ -38,21 +42,18 @@ runTgBot env = do
         threadDelay $ seconds 3
         runTgBot env'
 
-seconds :: Int -> Int
-seconds = (*1000000)
-
-sendWithQuery :: MonadIO m => Query -> String -> m BS.ByteString
-sendWithQuery query url = do
-    res <- httpBS req'
-    return $ getResponseBody res
     where
-        req = parseRequest_ url
-        req' = setRequestQueryString query req
+        handler :: HttpException -> IO B.Env
+        handler _ = do
+            B.logger env B.Debug "Timeout exception. Resending request..."
+            getUpdates env
 
 getUpdates :: B.Env -> IO B.Env
 getUpdates env = do
     let url = B.tgBaseUrl env <> "getUpdates"
-        query = [("offset", fmap (fromString . show) (B.updateId env))]
+        query = [ ("offset", fmap (fromString . show) (B.updateId env))
+                , ("timeout", (Just . fromString . show) pollTimeout)
+                ]
 
     B.logger env B.Debug $ "GET: " <> url
     json <- sendWithQuery query url
@@ -103,9 +104,9 @@ sendMessage env chatId' msg = do
 
         query :: [(BS.ByteString, Maybe BS.ByteString)]
         query = [ ("chat_id", (Just . fromString . show) chatId')
-                 , ("text", Just $ fromString msg)
-                 , ("reply_markup", markupM)
-                 ]
+                , ("text", Just $ fromString msg)
+                , ("reply_markup", markupM)
+                ]
 
         finalUrl = B.tgBaseUrl env <> "sendMessage"
 

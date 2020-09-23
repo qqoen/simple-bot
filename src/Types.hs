@@ -1,4 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 -- Common types: for JSON parsing, etc.
@@ -12,7 +11,7 @@ module Types
     , getChatId
     ) where
 
-import Prelude (Bool(..), Show(..), Integer, String, (.), ($), (<$>), (<*>))
+import Data.Maybe (fromMaybe)
 
 import Data.Aeson
 
@@ -27,7 +26,7 @@ data TgUpdate = TgUpdate
     } deriving (Show)
 
 data TgMessage = TgMessage
-    { text :: String
+    { text :: Maybe String
     , chat :: TgChat
     } deriving (Show)
 
@@ -45,14 +44,14 @@ instance FromJSON TgUpdate where
 
 instance FromJSON TgMessage where
     parseJSON = withObject "tgMessage" $ \o ->
-        TgMessage <$> o .: "text" <*> o .: "chat"
+        TgMessage <$> o .:? "text" <*> o .: "chat"
 
 instance FromJSON TgChat where
     parseJSON = withObject "tgChat" $ \o ->
         TgChat <$> o .: "id"
 
 getText :: TgUpdate -> String
-getText = text . message
+getText = fromMaybe "" . text . message
 
 getChatId :: TgUpdate -> Integer
 getChatId = chatId . chat . message

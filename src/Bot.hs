@@ -49,6 +49,7 @@ handleCommand env = case botMode env of
 
 handleIdle :: Env -> String -> (Env, [String])
 handleIdle env = \case
+    []        -> (env, [])
     "/help"   -> (env, [helpMsg env])
     "/repeat" ->
         let env' = env { botMode = AwaitingRepeatCount }
@@ -58,6 +59,7 @@ handleIdle env = \case
     msg       -> (env, replicate (repeatCount env) msg)
 
 handleAwait :: Env -> String -> (Env, [String])
+handleAwait env []  = (env, [])
 handleAwait env msg =
     if isInt
         then
