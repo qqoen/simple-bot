@@ -1,9 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-{-
-Common types: for JSON parsing, etc.
--}
+-- Common types: for JSON parsing, etc.
 
 module Types
     ( TgResponse(..)
@@ -38,12 +36,6 @@ newtype TgChat = TgChat
     { chatId :: Integer
     } deriving (Show)
 
-getText :: TgUpdate -> String
-getText = text . message
-
-getChatId :: TgUpdate -> Integer
-getChatId = chatId . chat . message
-
 instance FromJSON TgResponse where
     parseJSON = withObject "tgResponse" $ \o ->
         TgResponse <$> o .: "ok" <*> o .: "result"
@@ -59,3 +51,9 @@ instance FromJSON TgMessage where
 instance FromJSON TgChat where
     parseJSON = withObject "tgChat" $ \o ->
         TgChat <$> o .: "id"
+
+getText :: TgUpdate -> String
+getText = text . message
+
+getChatId :: TgUpdate -> Integer
+getChatId = chatId . chat . message

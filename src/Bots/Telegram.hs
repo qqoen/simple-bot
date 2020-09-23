@@ -1,9 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE LambdaCase #-}
 
-module Lib
-    ( startBot
-    , BotType(..)
+module Bots.Telegram
+    ( start
     ) where
 
 import qualified Data.ByteString.Char8 as BS
@@ -18,6 +16,7 @@ import Data.Aeson (decode)
 
 import qualified Types as T
 import qualified Bot as B
+import Config.Types
 
 data UpdateData = UpdateData
     { messages :: [String]
@@ -25,14 +24,8 @@ data UpdateData = UpdateData
     , updateId :: Integer
     }
 
-data BotType = Tg | Vk
-
-startBot :: BotType -> IO ()
-startBot = \case
-    Tg -> do
-        env <- B.getEnv
-        runTgBot env
-    Vk -> error "VK Bot is not implemented yet..."
+start :: BotConfig -> IO ()
+start cfg = runTgBot $ B.getEnv cfg
 
 runTgBot :: B.Env -> IO ()
 runTgBot env = do
