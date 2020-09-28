@@ -1,13 +1,13 @@
 # simple-bot
 
-Simple echo bot for messengers
+Simple echo bot for messengers.
 
-## Config
+## Configuration
 
 Rename `example.config` to `bot.config`
-and add your api tokens
+and add your api tokens.
 
-## Project setup
+## Installation and Execution
 
 ```
 stack build
