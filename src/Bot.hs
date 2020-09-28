@@ -15,7 +15,7 @@ module Bot
 import Prelude hiding (log)
 import Data.Char (isDigit)
 
-import qualified Config.Types as CT
+import qualified Bots.Types as BT
 
 data BotMode = Idle | AwaitingRepeatCount
 
@@ -50,16 +50,16 @@ updateBot bot env = do
     mapM_ (sendMessage bot env'') responses
     return env''
 
-getEnv :: CT.BotConfig -> Env
+getEnv :: BT.BotConfig -> Env
 getEnv cfg = Env
-    { helpMsg = CT.helpMsg cfg
-    , repeatMsg = CT.repeatMsg cfg
+    { helpMsg = BT.helpMsg cfg
+    , repeatMsg = BT.repeatMsg cfg
     , pollTimeout = 100
     , message = ""
-    , tgBaseUrl = "https://api.telegram.org/bot" <> CT.tgToken cfg <> "/"
+    , tgBaseUrl = "https://api.telegram.org/bot" <> BT.tgToken cfg <> "/"
     , updateId = Nothing
     , chatId = Nothing
-    , repeatCount = CT.defaultRepeat cfg
+    , repeatCount = BT.defaultRepeat cfg
     , botMode = Idle
     }
 

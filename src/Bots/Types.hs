@@ -1,12 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 
--- Common types: for JSON parsing, etc.
+-- Types for JSON parsing and config
 
-module Types
+module Bots.Types
     ( TgResponse(..)
     , TgUpdate(..)
     , TgMessage(..)
     , TgChat(..)
+    , BotConfig(..)
+    , BotType(..)
+
     , getText
     , getChatId
     ) where
@@ -14,6 +17,21 @@ module Types
 import Data.Maybe (fromMaybe)
 
 import Data.Aeson
+
+import Logger
+
+data BotType = Telegram | Vk
+
+data BotConfig = BotConfig
+    { helpMsg :: String
+    , repeatMsg :: String
+    , defaultRepeat :: Int
+    , tgToken :: String
+    , vkToken :: String
+    , logLevel :: Level
+    , logConsole :: Bool
+    , currentBot :: BotType
+    }
 
 data TgResponse = TgResponse 
     { ok :: Bool

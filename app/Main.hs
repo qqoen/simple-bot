@@ -2,8 +2,8 @@ module Main where
 
 import qualified Bots.Telegram as TG
 import qualified Bots.Vk as VK
-import Config.Types (currentBot, BotType(..))
-import Config.Parser (fromFile)
+import Bots.Types (BotType(..), BotConfig(..))
+import Config (fromFile)
 
 main :: IO ()
 main = do

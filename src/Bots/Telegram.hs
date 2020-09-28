@@ -13,25 +13,18 @@ import Data.String (fromString)
 import Control.Exception (catch)
 
 import Data.Aeson (decode)
-import Network.HTTP.Simple (HttpException(..))
 
-import qualified Types as T
+import qualified Bots.Types as T
 import qualified Bot as B
-import Config.Types
-import Common
-import Logger (logDebug)
+import HTTP
+import Logger (logDebug, logError)
 
-start :: BotConfig -> IO ()
+start :: T.BotConfig -> IO ()
 start cfg =
-    catch (B.runBot bot env) handler
+    catch (B.runBot bot env) (exceptionHandler $ B.runBot bot env)
     where
         env = B.getEnv cfg
         bot = B.Bot getUpdate sendMessage
-
-        handler :: HttpException -> IO ()
-        handler _ = do
-            logDebug "Timeout exception. Resending request..."
-            B.runBot bot env
 
 getUpdate :: B.Env -> IO B.Env
 getUpdate env = do

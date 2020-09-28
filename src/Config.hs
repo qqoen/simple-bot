@@ -1,4 +1,4 @@
-module Config.Parser
+module Config
     ( fromFile
     , Entry
     ) where
@@ -6,7 +6,7 @@ module Config.Parser
 import System.IO
 import Data.Maybe (fromMaybe)
 
-import Config.Types
+import Bots.Types
 
 type Entry = (String, String)
 

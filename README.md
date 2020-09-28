@@ -1,13 +1,15 @@
 # simple-bot
 
-Simple echo bot for Telegram and VK
+Simple echo bot for messengers
 
 ## Config
 
-bot.config file properties:
+Rename `example.config` to `bot.config`
+and add your api tokens
+
+## Project setup
 
 ```
-# bot api tokens
-TG_BOT_TOKEN=some_token_value
-VK_BOT_TOKEN=some_token_value
+stack build
+stack exec simple-bot-exe
 ```

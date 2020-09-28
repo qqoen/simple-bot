@@ -1,6 +1,6 @@
 module Bots.Vk where
 
-import Config.Types
+import Bots.Types
 
 start :: BotConfig -> IO ()
 start _ =
